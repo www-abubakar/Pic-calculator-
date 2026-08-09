@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="color-scheme" content="light dark">
   <title>Piece Set Calculator</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -10,53 +11,108 @@
 
   <main class="page">
 
-    <h1 class="title">Piece Set Calculator</h1>
+    <div class="calculator">
 
-    <!-- INPUT CARD -->
-    <section class="card">
+      <!-- HEADER -->
+      <header class="app-header">
+        <div class="app-header-top">
+          <div class="brand">
+            <span class="brand-icon" aria-hidden="true">
+              <!-- Simple inline SVG box/package icon -->
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2.5 L21 7.5 V16.5 L12 21.5 L3 16.5 V7.5 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M3 7.5 L12 12.5 L21 7.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M12 12.5 V21.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div class="brand-text">
+              <h1 class="app-title">Piece Set Calculator</h1>
+              <p class="app-subtitle">Calculate how many sets you need</p>
+            </div>
+          </div>
 
-      <label class="field-label" for="piecesPerSet">Pieces in one set</label>
-      <input
-        type="number"
-        id="piecesPerSet"
-        class="field-input"
-        placeholder="Example: 12"
-        inputmode="numeric"
-        min="1"
-      >
+          <!-- THEME TOGGLE -->
+          <button
+            id="themeToggle"
+            class="theme-toggle"
+            type="button"
+            aria-label="Switch to dark mode"
+            aria-pressed="false"
+          >
+            <!-- Sun icon (shown in light mode) -->
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M12 2.5V5M12 19V21.5M21.5 12H19M5 12H2.5M18.4 5.6L16.6 7.4M7.4 16.6L5.6 18.4M18.4 18.4L16.6 16.6M7.4 7.4L5.6 5.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+            <!-- Moon icon (shown in dark mode) -->
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 6.8 6.8 0 0 0 20 14.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </header>
 
-      <label class="field-label" for="requiredPieces">Required pieces</label>
-      <input
-        type="number"
-        id="requiredPieces"
-        class="field-input"
-        placeholder="Example: 120"
-        inputmode="numeric"
-        min="1"
-      >
+      <!-- INPUT CARD -->
+      <section class="card" aria-labelledby="formHeading">
+        <h2 id="formHeading" class="visually-hidden">Set calculation form</h2>
 
-      <!-- Friendly error message, hidden unless needed -->
-      <p id="errorMessage" class="error-message" hidden>Please enter valid numbers.</p>
+        <div class="field">
+          <label class="field-label" for="piecesPerSet">Pieces in 1 Set</label>
+          <input
+            type="number"
+            id="piecesPerSet"
+            class="field-input"
+            placeholder="Example: 12"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            min="1"
+            autocomplete="off"
+          >
+        </div>
 
-      <div class="button-row">
-        <button id="calculateBtn" class="btn btn-primary" type="button">Calculate</button>
-        <button id="resetBtn" class="btn btn-secondary" type="button">Reset</button>
-      </div>
+        <div class="field">
+          <label class="field-label" for="requiredPieces">Required Pieces</label>
+          <input
+            type="number"
+            id="requiredPieces"
+            class="field-input"
+            placeholder="Example: 120"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            min="1"
+            autocomplete="off"
+          >
+        </div>
 
-    </section>
+        <!-- Friendly error message, hidden unless needed -->
+        <p id="errorMessage" class="error-message" role="alert" hidden>
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="error-icon">
+            <circle cx="12" cy="12" r="9.25" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M12 7.5V13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="12" cy="16.3" r="1" fill="currentColor"/>
+          </svg>
+          Please enter valid numbers.
+        </p>
 
-    <!-- RESULT CARD (hidden until a calculation happens) -->
-    <section id="resultCard" class="result-card" hidden>
+        <div class="button-row">
+          <button id="calculateBtn" class="btn btn-primary" type="button">Calculate Sets</button>
+          <button id="resetBtn" class="btn btn-secondary" type="button">Reset</button>
+        </div>
+      </section>
 
-      <p class="result-label">Sets Required</p>
-      <p id="resultSets" class="result-number">0 SETS</p>
+      <!-- RESULT CARD (hidden until a calculation happens) -->
+      <section id="resultCard" class="result-card" hidden aria-live="polite">
+        <p class="result-label">Sets Required</p>
+        <p id="resultSets" class="result-number">0</p>
 
-      <div class="result-details">
-        <p id="resultEquation" class="result-line"></p>
-        <p id="resultTotalPieces" class="result-line"></p>
-      </div>
+        <div class="result-details">
+          <p id="resultEquation" class="result-line"></p>
+          <p id="resultExplain" class="result-line result-explain"></p>
+          <p id="resultTotalPieces" class="result-line result-total"></p>
+        </div>
+      </section>
 
-    </section>
+    </div>
 
   </main>
 
