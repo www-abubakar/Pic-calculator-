@@ -2,7 +2,7 @@
    PIECE SET CALCULATOR — LOGIC
    ============================================ */
 
-// Grab all the elements we need to work with
+// ---- Elements ----
 const piecesPerSetInput = document.getElementById('piecesPerSet');
 const requiredPiecesInput = document.getElementById('requiredPieces');
 const calculateBtn = document.getElementById('calculateBtn');
@@ -12,7 +12,72 @@ const errorMessage = document.getElementById('errorMessage');
 const resultCard = document.getElementById('resultCard');
 const resultSets = document.getElementById('resultSets');
 const resultEquation = document.getElementById('resultEquation');
+const resultExplain = document.getElementById('resultExplain');
 const resultTotalPieces = document.getElementById('resultTotalPieces');
+
+const themeToggle = document.getElementById('themeToggle');
+
+/* ============================================
+   THEME (Light / Dark) — remembered via localStorage
+   ============================================ */
+
+const THEME_STORAGE_KEY = 'pieceSetCalculator.theme';
+
+/**
+ * Applies a theme by setting a data-theme attribute on <html>
+ * and updates the toggle button's accessible state.
+ */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const isDark = theme === 'dark';
+  themeToggle.setAttribute('aria-pressed', String(isDark));
+  themeToggle.setAttribute(
+    'aria-label',
+    isDark ? 'Switch to light mode' : 'Switch to dark mode'
+  );
+}
+
+/**
+ * Figures out which theme to start with:
+ * 1. A previously saved choice in localStorage, if present.
+ * 2. Otherwise, the user's system preference.
+ * 3. Otherwise, defaults to light.
+ */
+function getInitialTheme() {
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    if (saved === 'light' || saved === 'dark') return saved;
+  } catch (e) {
+    // localStorage may be unavailable (e.g. private browsing) — ignore and fall back
+  }
+
+  const prefersDark = window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return prefersDark ? 'dark' : 'light';
+}
+
+function initTheme() {
+  applyTheme(getInitialTheme());
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, next);
+  } catch (e) {
+    // If storage isn't available, the theme still applies for this session
+  }
+}
+
+initTheme();
+themeToggle.addEventListener('click', toggleTheme);
+
+/* ============================================
+   CALCULATION LOGIC
+   (unchanged from the original version)
+   ============================================ */
 
 /**
  * Checks whether a value is a valid, positive, non-zero number.
@@ -74,7 +139,7 @@ function calculate() {
   const piecesPerSet = Number(piecesPerSetValue);
   const requiredPieces = Number(requiredPiecesValue);
 
-  // ---- CORE CALCULATION ----
+  // ---- CORE CALCULATION (do not change) ----
   // Math.ceil() always rounds UP to the next whole number.
   // This guarantees we never come up short on pieces, which is
   // the entire point of this calculator.
@@ -86,7 +151,7 @@ function calculate() {
   const totalPieces = setsRequired * piecesPerSet;
 
   // ---- DISPLAY RESULTS ----
-  resultSets.textContent = `${setsRequired} SET${setsRequired === 1 ? '' : 'S'}`;
+  resultSets.textContent = String(setsRequired);
 
   // Show the division clearly. If the division came out even,
   // show a clean equation. If rounding happened, show the decimal
@@ -95,10 +160,12 @@ function calculate() {
 
   if (isWholeNumber) {
     resultEquation.textContent = `${requiredPieces} ÷ ${piecesPerSet} = ${exactSets}`;
+    resultExplain.textContent = '';
   } else {
     const roundedDecimal = exactSets.toFixed(2);
-    resultEquation.textContent =
-      `${requiredPieces} ÷ ${piecesPerSet} = ${roundedDecimal} → rounded up to ${setsRequired}`;
+    resultEquation.textContent = `${requiredPieces} ÷ ${piecesPerSet} = ${roundedDecimal}`;
+    resultExplain.textContent =
+      `${setsRequired} set${setsRequired === 1 ? '' : 's'} are needed to cover ${requiredPieces} pieces.`;
   }
 
   resultTotalPieces.textContent = `Total pieces: ${totalPieces}`;
